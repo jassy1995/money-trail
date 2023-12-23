@@ -1,14 +1,31 @@
-import { useState } from "react";
+// import { useState } from "react";
+import { useForm } from 'react-hook-form';
 import { NavLink } from "react-router-dom";
 import "../styles/home.css";
+import { notify } from "../helpers/global";
+import { useLogin } from "../services/apis/auth";
+import { useNavigate } from 'react-router-dom';
+import useGlobalStore from '../stores/global';
 
 
 export default function Login() {
-    const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const handleSubmit = () => {
-        console.log(emial, password)
+    const { mutateAsync: loginUser, isLoading } = useLogin();
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm();
+    const navigate = useNavigate();
+    const updateUser = useGlobalStore((state) => state.setAuthUser);
+
+
+    const onSubmit = async (form) => {
+        try {
+            const { data } = await loginUser(form);
+            updateUser(data);
+            localStorage.setItem('money_trail_user', JSON.stringify(data));
+            notify({ type: 'success', message: 'Login successful!' })
+            reset()
+            navigate('/')
+        } catch (error) {
+            notify({ type: 'error', message: error.response.data.message || 'Login failed!' })
+        }
     }
 
     return (
@@ -43,22 +60,36 @@ export default function Login() {
                         <p className="mb-4 font-normal text-[18px] leading-[23.4px] text-[rgb(33,41,60)]">
                             Sign in to continue
                         </p>
-                        <form className="mt-10">
+                        <form className="mt-10" onSubmit={handleSubmit(onSubmit)} >
                             <div className="flex flex-col space-y-2 relative">
                                 <span className="flex space-x-2">
-                                    <label htmlFor="login-email" className="text-[rgb(110,112,117)] text-[15.6px]">Email or phone</label>
+                                    <label htmlFor="login-phone" className="text-[rgb(110,112,117)] text-[15.6px]">Phone</label>
                                     <span className="text-red-500">*</span>
                                 </span>
-                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="border-b outline-none py-2 border-[#AAAAAA] focus:border-blue-400 focus:border-b-2" name="acc-email" id="login-email"
+                                <input
+                                    type="text"
+                                    {...register('phone', {
+                                        required: 'This field is required.',
+                                        pattern: {
+                                            value: /^(081|080|070|090|091)\d{8}$/, // Update the pattern
+                                            message: 'Invalid phone number format.'
+                                        },
+                                        maxLength: {
+                                            value: 11,
+                                            message: 'Phone number must be 11 digits.'
+                                        }
+                                    })}
+                                    className="border-b outline-none py-2 border-[#AAAAAA] focus:border-blue-400 focus:border-b-2"
                                 />
+                                {errors.phone && <small className='text-red-400'>{errors.phone.message}</small>}
                             </div>
                             <div className="flex flex-col space-y-2 mt-4">
                                 <span className="flex space-x-2">
-                                    <label htmlFor="login-password" className="text-[rgb(110,112,117)] text-[15.6px]">Password</label>
+                                    <label htmlFor="password" className="text-[rgb(110,112,117)] text-[15.6px]">Password</label>
                                     <span className="text-red-500">*</span>
                                 </span>
-                                <input type="password" id="login-password" className="border-b outline-none py-2 border-[#AAAAAA] focus:border-blue-400 focus:border-b-2"
-                                    value={password} onChange={(e) => setPassword(e.target.value)} />
+                                <input {...register('password', { required: true })} type="password" id="password" className="border-b outline-none py-2 border-[#AAAAAA] focus:border-blue-400 focus:border-b-2" />
+                                {errors.password && <small className='text-red-400'>This field is required.</small>}
                             </div>
                             <NavLink to={`/auth`}>
                                 <p className="text-[18px] text-[rgb(108,117,125)] p-0 mt-4">
@@ -66,10 +97,11 @@ export default function Login() {
                                 </p>
                             </NavLink>
                             <div className="flex justify-between items-center mt-4">
-                                <button disabled={loading || !email || !password} type="submit" className="bg-blue-600 py-[10px] rounded-md w-full font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                    onClick={handleSubmit}>
-                                    {loading && <i className="fa fa-circle-notch fa-spin me-2"></i>}
-                                    Login
+                                <button disabled={!isValid || isLoading} type="submit" className="bg-blue-600 py-[10px] rounded-md w-full font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {/* {loading && <i className="fa fa-circle-notch fa-spin me-2"></i>} */}
+                                    {/* {isLoading ? <Loader /> : 'Submit'} */}
+                                    {isLoading && <i className="fa fa-circle-notch fa-spin mr-2"></i>}
+                                    Submit
                                 </button>
                             </div>
                             <p className="text-[18px] mt-4">Dont have an account?

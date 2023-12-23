@@ -13,6 +13,7 @@ import MerchantSignUp from "./pages/MerchantSignUp";
 import Pending from "./pages/Pending";
 import Approved from "./pages/Approved";
 import Login from "./pages/Login";
+import Auth from "./guards/auth";
 
 
 function App() {
@@ -21,7 +22,12 @@ function App() {
       <BrowserRouter>
         <ToastContainer position="top-right" limit={1} />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={
+            <Auth>
+              <Home />
+            </Auth>
+          } />
+          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/pending" element={<Pending />} />
           <Route path="/approved" element={<Approved />} />
           <Route path="/auth" element={<Login />} />

@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const http = axios.create({
-    // baseURL: "http://localhost:4100/api/v2/directory",
-    baseURL: "https://ccendpoints.herokuapp.com/api/v2/directory",
+    baseURL: "https://ccendpoints.herokuapp.com/api/v2/money-trail",
     headers: {
         "X-Requested-With": "XMLHttpRequest",
         "Content-Type": "application/json",
