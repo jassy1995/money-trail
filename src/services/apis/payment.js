@@ -31,14 +31,14 @@ export const useGetPaymentRecords = ({ pageSize }) => {
         queryKey: ['payment-records', { pageSize }],
         queryFn: fetchPaymentRecords,
         initialPageParam: 0,
-        keepPreviousData: true,
-        // getNextPageParam: (lastPage, pages) => lastPage.data.cursor,
-        getNextPageParam: (lastPage, pages) => {
-            const maxPage = lastPage.data.total / pageSize;
-            const nextPage = pages.length + 1;
-            return nextPage <= maxPage ? nextPage : undefined;
+        getNextPageParam: (lastPage, pages) => lastPage.data.cursor,
+        // keepPreviousData: false,
+        // getNextPageParam: (lastPage, pages) => {
+        //     const maxPage = lastPage.data.total / pageSize;
+        //     const nextPage = pages.length + 1;
+        //     return nextPage <= maxPage ? nextPage : undefined;
 
-        },
+        // },
     });
     return {
         data,

@@ -5,6 +5,7 @@ import UploadCard from '../components/UploadCard';
 import UploadForm from '../components/modals/UploadForm';
 import { useGetPaymentRecords } from "../services/apis/payment";
 import LazyLoader from '../components/globals/LazyLoader';
+import BallLoader from '../components/globals/BallLoader';
 
 
 
@@ -30,7 +31,7 @@ export default function Home() {
         isFetching,
         isFetchingNextPage,
         status,
-    } = useGetPaymentRecords({ pageSize: 2 });
+    } = useGetPaymentRecords({ pageSize: 1 });
 
 
 
@@ -42,7 +43,7 @@ export default function Home() {
             <DashboardLayout>
                 <UploadForm open={open} setClose={() => setOpen(false)} title='Upload file' />
                 {
-                    status === 'pending' ? <LoaderIndicator />
+                    status === 'pending' || (isFetching && !isFetchingNextPage) ? <LoaderIndicator />
                         : status === 'error' ? (<p>{error.message}</p>)
                             : (
                                 <div className='flex flex-col'>
@@ -51,7 +52,7 @@ export default function Home() {
                                         <div className='p-5 bg-white flex justify-between items-center card'>
                                             <h5 className="title m-0 hidden ss:block">
                                                 <span>Customers</span>
-                                                <span className="bg-red-500 text-white text-sm rounded-full inline-flex justify-center items-center font-medium px-2 py-[1px] ml-2">{data?.pages[0]?.data?.total}</span>
+                                                {!isFetching && <span className="bg-red-500 text-white text-sm rounded-full inline-flex justify-center items-center font-medium px-2 py-[1px] ml-2">{data?.pages[data.pages.length - 1]?.data?.total}</span>}
                                             </h5>
                                             <div className="m-0 ss:w-1/3 lg:w-1/2">
                                                 <input type="search" name="search" id="search" className="form-control rounded-full px-3 py-2 border border-[#e0e3e6]"
@@ -74,15 +75,16 @@ export default function Home() {
 
                                         ))}
                                     </div>
-                                    <div className='mt-3 text-center'>
-                                        {hasNextPage &&
-                                            <button className='border border-slate-300 rounded-md inline-flex justify-center items-center px-3 py-2 text-slate-600 font-medium hover:bg-slate-200' onClick={() => fetchNextPage()} disabled={!hasNextPage || isFetchingNextPage}>
+                                    <div className='mt-4 text-center'>
+                                        {(data?.pages[data.pages.length - 1]?.data?.end?.toString() === 'false' && !isFetchingNextPage) &&
+                                            <button className='border border-slate-300 rounded-md inline-flex justify-center items-center px-3 card py-2 text-slate-600 font-medium hover:bg-slate-200' onClick={() => fetchNextPage()} disabled={!hasNextPage || isFetchingNextPage}>
                                                 Load more
                                             </button>
                                         }
-                                        {(!hasNextPage && !isFetching && !isFetchingNextPage) && <p className='inline-flex justify-center items-center text-slate-400 font-normal w-full italic'>Nothing more to load! You have reach the end of the records.</p>}
-                                        {isFetchingNextPage && <p className='inline-flex justify-center items-center text-slate-400 font-normal w-full italic'>Loading more...</p>}
-                                        {isFetching && <p className='inline-flex justify-center items-center text-slate-400 font-normal w-full italic'>Fetching...</p>}
+                                        {(data?.pages[data.pages.length - 1]?.data?.end?.toString() === 'true' && !isFetching && !isFetchingNextPage) && <div className='inline-flex justify-center items-center text-slate-400 font-normal w-full italic'>Nothing more to load! You have reach the end of the records.</div>}
+                                        {isFetchingNextPage && <div className='inline-flex justify-center items-center text-slate-400 font-normal w-full italic'>
+                                            <BallLoader />
+                                        </div>}
                                     </div>
                                 </div>
                             )
