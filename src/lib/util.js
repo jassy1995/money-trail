@@ -95,3 +95,23 @@ export const users = [
         email: "steve.ogee@clan.africa"
     },
 ]
+
+// trunk-ignore(gitleaks/generic-api-key)
+export const apiKey = "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228"
+
+export const getRequest = (data, id) => {
+    if (Array.isArray(data) && data.length) {
+        return data.find(x => +x.REQUEST_ID === +id)
+    }
+}
+export const generateFullName = (firstName, lastName) => {
+    if (!firstName && !lastName) {
+        return 'friend';
+    } else if (!firstName || !lastName) {
+        return (firstName || lastName).charAt(0).toUpperCase() + (firstName || lastName).slice(1).toLowerCase();
+    } else {
+        const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+        const formattedLastName = lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+        return `${formattedFirstName} ${formattedLastName}`;
+    }
+}

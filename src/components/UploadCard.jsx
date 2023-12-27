@@ -1,13 +1,14 @@
-export default function UploadCard() {
+export default function UploadCard({ record }) {
     return (
-        <div className='flex flex-col sm:flex-row space-y-3 space-x-0 sm:space-x-5 bg-white w-full p-5 card'>
-            <img src="https://img.freepik.com/free-vector/realistic-receipt-template_23-2147938550.jpg?w=2000" className='w-full h-[150px] sm:w-[100px] sm:h-[100px] object-cover rounded-md sm:rounded-lg' alt="" />
-            <div className='flex flex-col space-y-3 justify-center w-full'>
-                <p className='max-w-xl text-sm'>An electronic receipt for payment is a digital document that serves as proof of a financial transaction</p>
-                <div className='flex justify-between items-center text-sm'>
-                    <span className='text-[#9BA3AF] flex items-center'> <span className="hidden sm:block mr-1">By:</span>Babatunde Joseph</span>
-                    <span className='text-[#9BA3AF]'>Feb 18, 1995.</span>
+        <div className='flex flex-col justify-center items-center sm:flex-row space-y-3 space-x-0 sm:space-y-0 sm:space-x-5 bg-white w-full p-4 card'>
+            <img src="https://img.freepik.com/free-vector/realistic-receipt-template_23-2147938550.jpg?w=2000" className='w-full h-[150px] sm:w-[80px] sm:h-[80px] object-cover rounded-md sm:rounded-full' alt="" />
+            <div className='flex flex-col justify-star w-full'>
+                <div className="flex justify-between items-center">
+                    <div className='capitalize text-black font-medium'>{record?.borrower_name?.toLowerCase()} <span className=" text-black font-normal">({record?.request_id})</span></div>
+                    <div className="text-slate-500">{record?.createdAt?.split('T')[0]}</div>
                 </div>
+                <div className='text-slate-600'>{record?.request?.Email}</div>
+                <div className='text-slate-600'>{record?.borrower_phone}</div>
             </div>
         </div>
     )

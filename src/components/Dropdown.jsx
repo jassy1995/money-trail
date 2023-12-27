@@ -4,6 +4,8 @@ import { HiChevronDown } from "react-icons/hi";
 import { IoMdPower, IoMdSettings } from "react-icons/io";
 import { FaRegUserCircle, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import { generateFullName } from '../lib/util';
+
 
 export default function Dropdown() {
     const [isOpen, setIsOpen] = useState(false);
@@ -15,18 +17,6 @@ export default function Dropdown() {
         updateUser(null);
         localStorage.removeItem('money_trail_user');
         navigate('/auth')
-    }
-
-    const generateFullName = (firstName, lastName) => {
-        if (!firstName && !lastName) {
-            return 'friend';
-        } else if (!firstName || !lastName) {
-            return (firstName || lastName).charAt(0).toUpperCase() + (firstName || lastName).slice(1).toLowerCase();
-        } else {
-            const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
-            const formattedLastName = lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
-            return `${formattedFirstName} ${formattedLastName}`;
-        }
     }
 
     const fullName = useMemo(() => {

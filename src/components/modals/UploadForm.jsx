@@ -2,9 +2,15 @@ import { useState, useRef } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import Modal from '../globals/Modal';
 import { notify } from "../../helpers/global";
+import { getRequest } from "../../lib/util";
+import { paymentRecords } from "../../services/util"
+import useGlobalStore from "../../stores/global";
+import { uploadDocumentToServer, useCreatePaymentRecord } from "../../services/apis/payment";
 
 export default function UploadForm({ open, setClose, title }) {
-    const [file, setFile] = useState();
+    const { mutateAsync: createPayemtRecord, isLoading } = useCreatePaymentRecord();
+    const { auth_user } = useGlobalStore(state => state.data);
+    const [file, setFile] = useState(null);
     const [requestId, setRequestId] = useState('');
     const [description, setDescription] = useState('');
     const [isUploading, setIsUploading] = useState(false);
@@ -15,39 +21,84 @@ export default function UploadForm({ open, setClose, title }) {
         hiddenFileInput.current.click();
     };
     const handleChange = event => {
-        const fileUploaded = event.target.files[0];
-        setFile(fileUploaded);
-        if (fileUploaded.type.includes("image")) {
-            const reader = new FileReader();
-            reader.readAsDataURL(fileUploaded);
-            reader.onload = function () {
-                setPreview(reader.result);
+        console.log(event.target.files)
+        if (event.target.files && event.target.files.length > 0) {
+            const fileUploaded = event.target.files[0]
+            setFile(fileUploaded);
+            console.log(file)
+            if (fileUploaded.type.includes("image")) {
+                const reader = new FileReader();
+                reader.readAsDataURL(fileUploaded);
+                reader.onload = function () {
+                    setPreview(reader.result);
+                };
+            } else {
+                setPreview('../../../public/file-placeholder.png');
             };
         } else {
-            setPreview(null);
+            notify({ type: 'error', message: 'No file selected!' });
         }
-    };
-
-    const submitForm = () => {
+    }
+    const sendFileToServer = async (request_id) => {
+        let formData = new FormData();
+        formData.append("file", file);
+        formData.append('doctype_', 'report');
+        formData.append('request_id', request_id);
+        const { status, file_url } = await uploadDocumentToServer(formData);
+        if (status) {
+            return { status, file_url };
+        } else {
+            return { status: false, file_url: null };
+        }
+    }
+    const submitForm = async () => {
+        console.log(file);
         try {
             setIsUploading(true);
-            setTimeout(() => {
+            const request = getRequest(paymentRecords, requestId);
+            if (!request) {
                 setIsUploading(false);
-                notify({ type: 'success', message: 'Uploaded successfully' })
-                setFile(null);
-                setPreview(null);
-                setDescription('');
-
-            }, 3000);
-            console.log('Uploading', file)
-            console.log('Description', description)
+                notify({ type: 'error', message: 'Request not found!' });
+                return;
+            } else {
+                const { status, file_url } = await sendFileToServer(requestId);
+                setIsUploading(false);
+                if (!status) {
+                    notify({ type: 'error', message: 'Receipt upload failed!' });
+                    return;
+                } else {
+                    const payload = {
+                        request_id: requestId,
+                        uploader_name: auth_user.firstname,
+                        uploader_phone: auth_user.lastname,
+                        description,
+                        file_url,
+                        request: JSON.stringify(request),
+                    }
+                    const { data: { status } } = await createPayemtRecord(payload);
+                    if (!status) {
+                        setIsUploading(false);
+                        notify({ type: 'error', message: 'Receipt upload failed!' });
+                    } else {
+                        setIsUploading(false);
+                        notify({ type: 'success', message: 'Uploaded successfully' });
+                        setRequestId('');
+                        setFile(null);
+                        setPreview(null);
+                        setDescription('');
+                    }
+                }
+            }
         } catch (error) {
-
+            setIsUploading(false);
+            notify({ type: 'error', message: 'Receipt upload failed!' });
+            console.log(error);
         }
     }
     return (
         <Modal open={open} setClose={setClose} title={title} width='max-w-2xl'>
             <div className="flex flex-col justify-center items-center space-y-10 pb-10 bg-white">
+                <input type="number" value={requestId} name="requestId" onChange={(e) => setRequestId(e.target.value)} className="outline-none mt-10 w-full px-4 py-3 border rounded-lg shadow-sm" placeholder="enter request id" />
                 <input
                     type="file"
                     ref={hiddenFileInput}
@@ -69,11 +120,11 @@ export default function UploadForm({ open, setClose, title }) {
                         <button onClick={handleClick} className="text-slate-400">Browse file to upload</button>
                     </div>
                 }
-                <input type="number" value={requestId} name="requestId" onChange={(e) => setRequestId(e.target.value)} className="outline-none mt-10 w-full px-4 py-3 border rounded-lg shadow-sm" placeholder="enter request id" />
+
                 <textarea value={description} onChange={(e) => setDescription(e.target.value)} name="" id="" placeholder="description (optional)" className="outline-none mt-10 w-full h-32 p-4 border rounded-lg shadow-sm"></textarea>
                 <div className="w-full">
-                    <button disabled={isUploading} onClick={submitForm} className="text-white bg-blue-500 hover:bg-blue-600 rounded-lg px-3 py-2 w-full sm:w-32 font-normal disabled:opacity-75 disabled:cursor-not-allowed">
-                        {isUploading && <i className="fa fa-circle-notch fa-spin mr-2"></i>}
+                    <button disabled={isLoading || isUploading || !requestId || !file} onClick={submitForm} className="text-white bg-blue-500 hover:bg-blue-600 rounded-lg px-3 py-2 w-full sm:w-32 font-normal disabled:opacity-75 disabled:cursor-not-allowed">
+                        {(isUploading || isLoading) && <i className="fa fa-circle-notch fa-spin mr-2"></i>}
                         Submit
                     </button>
                 </div>
