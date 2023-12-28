@@ -4,25 +4,17 @@ import { MdUpload } from "react-icons/md";
 import UploadCard from '../components/UploadCard';
 import UploadForm from '../components/modals/UploadForm';
 import { useGetPaymentRecords } from "../services/apis/payment";
-import LazyLoader from '../components/globals/LazyLoader';
 import BallLoader from '../components/globals/BallLoader';
+import { LoaderIndicator } from '../components/globals/LoaderIndicator';
+import ViewDetail from '../components/modals/ViewDetail';
 
 
 
-const LoaderIndicator = () => {
-    return (
-        <div className='flex flex-col'>
-            {
-                [1, 2, 3].map((r, i) => (
-                    <LazyLoader key={i} />
-                ))
-            }
-        </div>
-    )
-}
 
 export default function Home() {
     const [open, setOpen] = useState(false);
+    const [openView, setOpenView] = useState(false);
+    const [requestDetail, setRequestDetail] = useState({});
     const {
         data,
         error,
@@ -36,14 +28,15 @@ export default function Home() {
 
 
 
-    if (status === 'pending') return <LoaderIndicator />
+    if (status === 'pending') return <LoaderIndicator counts={[1, 2, 3]} />
     else if (status === 'error') return <p>{error.message}</p>
     else {
         return (
             <DashboardLayout>
                 <UploadForm open={open} setClose={() => setOpen(false)} title='Upload file' />
+                <ViewDetail open={openView} request={requestDetail} setClose={() => setOpenView(false)} title='View Detail' />
                 {
-                    status === 'pending' || (isFetching && !isFetchingNextPage) ? <LoaderIndicator />
+                    status === 'pending' || (isFetching && !isFetchingNextPage) ? <LoaderIndicator counts={[1, 2, 3]} />
                         : status === 'error' ? (<p>{error.message}</p>)
                             : (
                                 <div className='flex flex-col'>
@@ -68,7 +61,9 @@ export default function Home() {
                                             <Fragment key={i}>
                                                 {
                                                     group?.data.response?.map((record, i) => (
-                                                        <UploadCard key={i} record={record} />
+                                                        <UploadCard key={i} record={record} setCurrentRequest={() => {
+                                                            setRequestDetail(record); setOpenView(true);
+                                                        }} />
                                                     ))
                                                 }
                                             </Fragment>

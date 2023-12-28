@@ -20,7 +20,7 @@ export default function Modal({ children, open, setClose, title, width }) {
 
                 <div className="fixed inset-0 overflow-hidden">
                     <div className="absolute inset-0 overflow-hidden">
-                        <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                        <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-5">
                             <Transition.Child
                                 as={Fragment}
                                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -30,9 +30,9 @@ export default function Modal({ children, open, setClose, title, width }) {
                                 leaveFrom="translate-x-0"
                                 leaveTo="translate-x-full"
                             >
-                                <Dialog.Panel className={`pointer-events-auto relative w-screen ${width}`}>
+                                <Dialog.Panel className={`pointer-events-auto relative w-full sm:w-screen ${width}`}>
                                     <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
-                                        <div className="flex justify-between items-center px-6 sm:px-10">
+                                        <div className="flex justify-between items-center pb-4 px-4 sm:px-10">
                                             <Dialog.Title className="flex text-base font-medium uppercase leading-6 text-gray-500">
                                                 {title ? title : 'Dialog'}
                                             </Dialog.Title>
@@ -45,7 +45,7 @@ export default function Modal({ children, open, setClose, title, width }) {
                                                 <XMarkIcon className="h-6 w-6 font-semibold" aria-hidden="true" />
                                             </button>
                                         </div>
-                                        <div className="relative mt-2 flex-1 px-6 sm:px-10 border-t-2">{children}</div>
+                                        <div className="relative mt-2 flex-1 px-4 sm:px-10 border-t-2">{children}</div>
                                     </div>
                                 </Dialog.Panel>
                             </Transition.Child>
