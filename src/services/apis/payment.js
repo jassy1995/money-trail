@@ -50,6 +50,22 @@ export const useGetPaymentRecords = ({ pageSize }) => {
         status,
     };
 };
+export const useApprove = () => {
+    const { mutate, mutateAsync, isLoading } = useMutation({
+        mutationFn: (payload) => {
+            return http.post("/approve", payload);
+        },
+    });
+    return { mutate, mutateAsync, isLoading };
+};
+export const useReject = () => {
+    const { mutate, mutateAsync, isLoading } = useMutation({
+        mutationFn: (payload) => {
+            return http.post("/reject", payload);
+        },
+    });
+    return { mutate, mutateAsync, isLoading };
+};
 export const uploadDocumentToServer = async (formData) => {
     try {
         const { data: { status, fullpath } } = await axios.post(`https://mobile.creditclan.com/api/v3/file/upload`, formData, { headers: { "x-api-key": apiKey } });
@@ -58,5 +74,14 @@ export const uploadDocumentToServer = async (formData) => {
     } catch (error) {
         console.log(error)
         return { status: false, file_url: '' }
+    }
+}
+export const getRequestById = async (request_id) => {
+    try {
+        const { data: { data: request } } = await http.get(`https://lendnode.creditclan.com/request_by_id/${request_id}`);
+        return request
+    } catch (error) {
+        console.log(error)
+        return null;
     }
 }

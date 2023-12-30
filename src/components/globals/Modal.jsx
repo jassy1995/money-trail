@@ -20,7 +20,8 @@ export default function Modal({ children, open, setClose, title, width }) {
 
                 <div className="fixed inset-0 overflow-hidden">
                     <div className="absolute inset-0 overflow-hidden">
-                        <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-5">
+                        {/* <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full w-full"> */}
+                        <div className={`pointer-events-none fixed inset-y-0 right-0 flex w-full  ${width}`}>
                             <Transition.Child
                                 as={Fragment}
                                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -30,7 +31,7 @@ export default function Modal({ children, open, setClose, title, width }) {
                                 leaveFrom="translate-x-0"
                                 leaveTo="translate-x-full"
                             >
-                                <Dialog.Panel className={`pointer-events-auto relative w-full sm:w-screen ${width}`}>
+                                <Dialog.Panel className={`pointer-events-auto relative w-full  ${width}`}>
                                     <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
                                         <div className="flex justify-between items-center pb-4 px-4 sm:px-10">
                                             <Dialog.Title className="flex text-base font-medium uppercase leading-6 text-gray-500">

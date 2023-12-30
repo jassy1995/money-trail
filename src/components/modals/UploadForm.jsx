@@ -5,7 +5,7 @@ import { notify } from "../../helpers/global";
 import { getRequest } from "../../lib/util";
 import { paymentRecords } from "../../services/util"
 import useGlobalStore from "../../stores/global";
-import { uploadDocumentToServer, useCreatePaymentRecord } from "../../services/apis/payment";
+import { getRequestById, uploadDocumentToServer, useCreatePaymentRecord } from "../../services/apis/payment";
 
 export default function UploadForm({ open, setClose, title }) {
     const { mutateAsync: createPayemtRecord, isLoading } = useCreatePaymentRecord();
@@ -52,10 +52,10 @@ export default function UploadForm({ open, setClose, title }) {
         }
     }
     const submitForm = async () => {
-        console.log(file);
         try {
             setIsUploading(true);
-            const request = getRequest(paymentRecords, requestId);
+            const request = await getRequestById(requestId);
+            console.log(request);
             if (!request) {
                 setIsUploading(false);
                 notify({ type: 'error', message: 'Request not found!' });
@@ -97,7 +97,7 @@ export default function UploadForm({ open, setClose, title }) {
     }
     return (
         <Modal open={open} setClose={setClose} title={title} width='max-w-2xl'>
-            <div className="flex flex-col justify-center items-center space-y-10 pb-10 bg-white">
+            <div className="flex flex-col justify-center items-center space-y-10 pb-10 bg-white w-full">
                 <input type="number" value={requestId} name="requestId" onChange={(e) => setRequestId(e.target.value)} className="outline-none mt-10 w-full px-4 py-3 border rounded-lg shadow-sm" placeholder="enter request id" />
                 <input
                     type="file"
@@ -107,21 +107,21 @@ export default function UploadForm({ open, setClose, title }) {
                 />
 
                 {preview &&
-                    <div className="bg-white flex flex-col space-y-5 justify-center">
-                        <img src={preview} alt="Preview" className="border-2 border-dashed" />
+                    <div className="bg-white flex flex-col space-y-5 justify-center w-full">
+                        <img src={preview} alt="Preview" className="border-2 border-dashed w-full h-[200px] object-cover" />
                         <div className="w-full inline-flex justify-center">
                             <button onClick={handleClick} className="px-3 py-2 rounded-lg bg-blue-100 text-blue-600">Change selected file</button>
                         </div>
                     </div>
                 }
                 {!preview &&
-                    <div onClick={handleClick} className="bg-white flex flex-col justify-center items-center space-y-5 border-2 border-dashed w-full py-8 rounded-lg shadow-sm hover:cursor-pointer hover:shadow-md transition duration-700">
+                    <div onClick={handleClick} className="bg-white flex flex-col justify-center items-center space-y-5 border-2 border-dashed w-full h-[200px] py-8 rounded-lg shadow-sm hover:cursor-pointer hover:shadow-md transition duration-700">
                         <FaCloudUploadAlt className="w-16 h-16 text-slate-500" />
                         <button onClick={handleClick} className="text-slate-400">Browse file to upload</button>
                     </div>
                 }
 
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} name="" id="" placeholder="description (optional)" className="outline-none mt-10 w-full h-32 p-4 border rounded-lg shadow-sm"></textarea>
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} name="" id="" placeholder="description (optional)" className="outline-none mt-10 w-full h-20 p-4 border rounded-lg shadow-sm"></textarea>
                 <div className="w-full">
                     <button disabled={isLoading || isUploading || !requestId || !file} onClick={submitForm} className="text-white bg-blue-500 hover:bg-blue-600 rounded-lg px-3 py-2 w-full sm:w-32 font-normal disabled:opacity-75 disabled:cursor-not-allowed">
                         {(isUploading || isLoading) && <i className="fa fa-circle-notch fa-spin mr-2"></i>}

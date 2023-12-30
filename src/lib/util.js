@@ -9,6 +9,16 @@ export const timeFormatter = (date) => {
     return strTime;
 };
 
+export const isoTimeFormater = (isoDate) => {
+    const date = new Date(isoDate);
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+
+}
+
 export const capitalizeFirstLetter = (string) => {
     return string.charAt(0)?.toUpperCase() + string?.slice(1);
 }

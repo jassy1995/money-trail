@@ -31,9 +31,9 @@ export default function ViewDetail({ open, setClose, title, request }) {
             http.get(`/receipts?id=${request.id}`)
                 .then(({ data: { status, response } }) => {
                     if (status) {
-                        setReceipt(response);
+                        setReceipt(handleSorting(response));
                     } else {
-                        notify({ type: 'error', message: 'unable to fetch receiptee' });
+                        notify({ type: 'error', message: 'unable to fetch receipt' });
                     }
                     setLoading(false);
                 })
@@ -64,8 +64,19 @@ export default function ViewDetail({ open, setClose, title, request }) {
         }
         setFilteredReceipt(matchResult);
     }
+    const handleReceiptUpdate = ({ id, status, comment }) => {
+        if (comment) {
+            const newUpdate = receipts.map(r => r.id === id ? { ...r, status, reject_comment: comment } : r);
+            setReceipt(newUpdate)
+        } else {
+            const newUpdate = receipts.map(r => r.id === id ? { ...r, status } : r);
+            setReceipt(newUpdate)
+        }
+    }
 
-
+    const handleSorting = (data) => {
+        return data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
 
     // const onSubmit = async (form) => {
     //     try {
@@ -146,7 +157,7 @@ export default function ViewDetail({ open, setClose, title, request }) {
                         <div className='w-full'>
                             {
                                 !loading && !receipts.length
-                                    ? <div className='w-full flex justify-center items-center my-[320px] font-medium text-slate-400 text-2xl'>No receipt yet</div>
+                                    ? <div className='w-full flex justify-center items-center my-[280px] sm:my-[320px] font-medium text-slate-400 text-2xl'>No receipt yet</div>
                                     :
                                     <div className='flex flex-col w-full'>
                                         <div className='flex justify-between items-center mt-4 w-full'>
@@ -158,10 +169,10 @@ export default function ViewDetail({ open, setClose, title, request }) {
                                             </select>
                                         </div>
                                         <div>
-                                            {(isFilter && !items.length) && <div className='w-full flex justify-center items-center my-[320px] font-medium text-slate-400 text-2xl'>No record found</div>}
+                                            {(isFilter && !items.length) && <div className='w-full flex justify-center items-center my-[270px] sm:my-[320px] font-medium text-slate-400 text-2xl'>No record found</div>}
                                             <div className='w-full flex flex-col space-y-6 pt-3'>
                                                 {items?.map((receipt, i) => (
-                                                    <FilePreview key={i} receipt={receipt} />
+                                                    <FilePreview key={i} receipt={receipt} updateReceipt={handleReceiptUpdate} />
                                                 ))
                                                 }
                                             </div>
