@@ -9,6 +9,7 @@ import { FaRegCopy } from "react-icons/fa";
 import Modal from '../globals/Modal';
 import { LoaderIndicator } from '../globals/LoaderIndicator';
 import FilePreview from '../FilePreview';
+import NoRecordFound from '../globals/NoRecordFound';
 
 export default function ViewDetail({ open, setClose, title, request }) {
     // const { mutateAsync: createNewUser, isLoading: isLoading1 } = useCreateUser();
@@ -169,7 +170,7 @@ export default function ViewDetail({ open, setClose, title, request }) {
                                             </select>
                                         </div>
                                         <div>
-                                            {(isFilter && !items.length) && <div className='w-full flex justify-center items-center my-[270px] sm:my-[320px] font-medium text-slate-400 text-2xl'>No record found</div>}
+                                            {(isFilter && !items.length) && <NoRecordFound />}
                                             <div className='w-full flex flex-col space-y-6 pt-3'>
                                                 {items?.map((receipt, i) => (
                                                     <FilePreview key={i} receipt={receipt} updateReceipt={handleReceiptUpdate} />
@@ -178,7 +179,6 @@ export default function ViewDetail({ open, setClose, title, request }) {
                                             </div>
 
                                         </div>
-
                                     </div>
                             }
                         </div>
