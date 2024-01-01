@@ -5,7 +5,6 @@ import { IoMdPower, IoMdSettings } from "react-icons/io";
 import { FaRegUserCircle, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
-
 export default function Dropdown() {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();

@@ -10,8 +10,6 @@ import ViewDetail from '../components/modals/ViewDetail';
 import useDebouncedSearch from '../hooks/useSearch';
 import NoRecordFound from '../components/globals/NoRecordFound';
 
-
-
 export default function Home() {
     const [open, setOpen] = useState(false);
     const [openView, setOpenView] = useState(false);
@@ -32,7 +30,6 @@ export default function Home() {
         if (query) {
             setIsSearched(true);
             setSearchParam(query);
-            // console.log('Performing search with query:', query);
         } else {
             setIsSearched(false);
         }

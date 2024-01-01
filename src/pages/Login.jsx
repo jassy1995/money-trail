@@ -1,11 +1,10 @@
-// import { useState } from "react";
 import { useForm } from 'react-hook-form';
 import { NavLink } from "react-router-dom";
-import "../styles/home.css";
 import { notify } from "../helpers/global";
 import { useLogin } from "../services/apis/auth";
 import { useNavigate } from 'react-router-dom';
 import useGlobalStore from '../stores/global';
+import "../styles/home.css";
 
 
 export default function Login() {
@@ -71,7 +70,7 @@ export default function Login() {
                                     {...register('phone', {
                                         required: 'This field is required.',
                                         pattern: {
-                                            value: /^(081|080|070|090|091)\d{8}$/, // Update the pattern
+                                            value: /^(081|080|070|090|091)\d{8}$/,
                                             message: 'Invalid phone number format.'
                                         },
                                         maxLength: {
@@ -98,8 +97,6 @@ export default function Login() {
                             </NavLink>
                             <div className="flex justify-between items-center mt-4">
                                 <button disabled={!isValid || isLoading} type="submit" className="bg-blue-600 py-[10px] rounded-md w-full font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {/* {loading && <i className="fa fa-circle-notch fa-spin me-2"></i>} */}
-                                    {/* {isLoading ? <Loader /> : 'Submit'} */}
                                     {isLoading && <i className="fa fa-circle-notch fa-spin mr-2"></i>}
                                     Submit
                                 </button>

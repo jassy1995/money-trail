@@ -2,8 +2,6 @@ import { useState, useRef } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import Modal from '../globals/Modal';
 import { notify } from "../../helpers/global";
-import { getRequest } from "../../lib/util";
-import { paymentRecords } from "../../services/util"
 import useGlobalStore from "../../stores/global";
 import { getRequestById, uploadDocumentToServer, useCreatePaymentRecord } from "../../services/apis/payment";
 

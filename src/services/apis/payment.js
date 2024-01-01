@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import http from "../../lib/http"
 import { apiKey } from "../../lib/util";
 import axios from "axios";
-import { useState } from 'react';
+
 
 export const useCreatePaymentRecord = () => {
     const queryClient = useQueryClient()
@@ -43,13 +43,6 @@ export const useGetPaymentRecords = ({ pageSize, searchParam, isSearched }) => {
         keepPreviousData: true,
         staleTime: Infinity,
         getNextPageParam: (lastPage, pages) => lastPage.data.cursor,
-        // keepPreviousData: false,
-        // getNextPageParam: (lastPage, pages) => {
-        //     const maxPage = lastPage.data.total / pageSize;
-        //     const nextPage = pages.length + 1;
-        //     return nextPage <= maxPage ? nextPage : undefined;
-
-        // },
     });
     return {
         data,
@@ -61,48 +54,6 @@ export const useGetPaymentRecords = ({ pageSize, searchParam, isSearched }) => {
         status,
     };
 };
-
-
-// const getPropety = ({ pageParam = 1, queryKey }) => {
-//   const location = queryKey[1]?.location;
-//   const type = queryKey[2]?.type ;
-//   const price = queryKey[3]?.price ;
-//   const isFilter = queryKey[4]?.isFilter
-//   if (!!location && !!type && !!price && isFilter) {
-//     return http.get(
-//       `/all?pageNumber=${pageParam}&pageSize=${page_size}&country=${location}&type=${type}&price=${price}`,
-//     )
-//   } else {
-//     return http.get(
-//       `/all?pageNumber=${pageParam}&pageSize=${page_size}`,
-//     )
-//   }
-
-
-// }
-// export const useGetPropertyQuery = ({ location, type, price,isFilter }) => {
-//   const { data, isSuccess, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage ,isError} = useInfiniteQuery(
-//     ['properties', { location }, { type }, { price },{ isFilter }],
-//     getPropety,
-//     {
-//       getNextPageParam: (lastPage, pages) => {
-//         const maxPage = lastPage.data.total_count / page_size;
-//         const nextPage = pages.length + 1;
-//         return nextPage <= maxPage ? nextPage : undefined;
-
-//       },
-//     }
-//   );
-//   return { data, isSuccess, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage ,isError};
-// };
-
-
-
-
-
-
-
-
 export const useApprove = () => {
     const { mutate, mutateAsync, isLoading } = useMutation({
         mutationFn: (payload) => {
