@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useCallback } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { MdUpload } from "react-icons/md";
 import UploadCard from '../components/UploadCard';
@@ -11,7 +11,7 @@ import useDebouncedSearch from '../hooks/useSearch';
 import NoRecordFound from '../components/globals/NoRecordFound';
 
 export default function Home() {
-    const [open, setOpen] = useState(false);
+    const [openForm, setOpenForm] = useState(false);
     const [openView, setOpenView] = useState(false);
     const [isSearched, setIsSearched] = useState(false);
     const [searchParam, setSearchParam] = useState('');
@@ -35,14 +35,20 @@ export default function Home() {
         }
     }, 800);
 
+    const handleSetFormClose = useCallback(() => setOpenForm(false), []);
+    const handleSetDetailClose = useCallback(() => setOpenView(false), []);
+    const handleCurrentRequest = useCallback((record) => {
+        setRequestDetail(record);
+        setOpenView(true);
+    }, []);
 
     if (status === 'pending') return <LoaderIndicator counts={[1, 2, 3]} />
     else if (status === 'error') return <p>{error.message}</p>
     else {
         return (
             <DashboardLayout>
-                <UploadForm open={open} setClose={() => setOpen(false)} title='Upload file' />
-                <ViewDetail open={openView} request={requestDetail} setClose={() => setOpenView(false)} title='View Detail' />
+                <UploadForm open={openForm} setClose={handleSetFormClose} title='Upload file' />
+                <ViewDetail open={openView} request={requestDetail} setClose={handleSetDetailClose} title='View Detail' />
                 {
                     status === 'pending' || (isFetching && !isFetchingNextPage) && !isSearched ? <LoaderIndicator counts={[1, 2, 3]} />
                         : status === 'error' ? (<p>{error.message}</p>)
@@ -59,7 +65,7 @@ export default function Home() {
                                                 <input ref={searchRef} type="search" name="search" id="search" className="form-control rounded-full px-3 py-2 border border-[#e0e3e6]"
                                                     placeholder="Search.." />
                                             </div>
-                                            <button onClick={() => setOpen(true)} className="border border-slate-200 px-3 py-[5px] rounded-full inline-flex justify-center items-center">
+                                            <button onClick={() => setOpenForm(true)} className="border border-slate-200 px-3 py-[5px] rounded-full inline-flex justify-center items-center">
                                                 <MdUpload className='text-[#9BA3AF] xs:w-5 xs:h-5 w-6 h-6' />
                                                 <span className='text-[#9BA3AF] hidden xs:block'>New upload</span>
                                             </button>
@@ -71,9 +77,7 @@ export default function Home() {
                                             <Fragment key={i}>
                                                 {
                                                     group?.data.response?.map((record, i) => (
-                                                        <UploadCard key={i} record={record} setCurrentRequest={() => {
-                                                            setRequestDetail(record); setOpenView(true);
-                                                        }} />
+                                                        <UploadCard key={i} record={record} setCurrentRequest={() => handleCurrentRequest(record)} />
                                                     ))
                                                 }
                                             </Fragment>

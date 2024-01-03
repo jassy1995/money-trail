@@ -4,16 +4,19 @@ import { HiChevronDown } from "react-icons/hi";
 import { IoMdPower, IoMdSettings } from "react-icons/io";
 import { FaRegUserCircle, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import useLocalStorage from '../hooks/useStorage';
+
 
 export default function Dropdown() {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
+    const { removeItem } = useLocalStorage('money_trail_user')
     const { auth_user } = useGlobalStore(state => state.data);
     const updateUser = useGlobalStore((state) => state.setAuthUser);
 
     const logout = () => {
         updateUser(null);
-        localStorage.removeItem('money_trail_user');
+        removeItem('money_trail_user');
         navigate('/auth')
     }
 

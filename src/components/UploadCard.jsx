@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 
-export default function UploadCard({ record, setCurrentRequest }) {
+function UploadCard({ record, setCurrentRequest }) {
+    console.log('UploadCard');
     const getImage = useMemo(() => {
         return (imageUrl) => {
             if (imageUrl && imageUrl.startsWith("https")) {
@@ -28,3 +29,5 @@ export default function UploadCard({ record, setCurrentRequest }) {
         </div>
     )
 }
+
+export default memo(UploadCard)

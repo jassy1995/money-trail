@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { notify } from "../../helpers/global"
 import http from "../../lib/http";
 import Modal from '../globals/Modal';
@@ -6,7 +6,7 @@ import { LoaderIndicator } from '../globals/LoaderIndicator';
 import FilePreview from '../FilePreview';
 import NoRecordFound from '../globals/NoRecordFound';
 
-export default function ViewDetail({ open, setClose, title, request }) {
+function ViewDetail({ open, setClose, title, request }) {
     const [receipts, setReceipt] = useState([]);
     const [filteredReceipts, setFilteredReceipt] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -111,3 +111,5 @@ export default function ViewDetail({ open, setClose, title, request }) {
         </>
     )
 }
+
+export default memo(ViewDetail)

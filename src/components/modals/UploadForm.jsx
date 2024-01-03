@@ -1,11 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, memo } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import Modal from '../globals/Modal';
 import { notify } from "../../helpers/global";
 import useGlobalStore from "../../stores/global";
 import { getRequestById, uploadDocumentToServer, useCreatePaymentRecord } from "../../services/apis/payment";
 
-export default function UploadForm({ open, setClose, title }) {
+function UploadForm({ open, setClose, title }) {
     const { mutateAsync: createPayemtRecord, isLoading } = useCreatePaymentRecord();
     const { auth_user } = useGlobalStore(state => state.data);
     const [file, setFile] = useState(null);
@@ -130,3 +130,5 @@ export default function UploadForm({ open, setClose, title }) {
         </Modal>
     )
 }
+
+export default memo(UploadForm)

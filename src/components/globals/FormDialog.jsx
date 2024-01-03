@@ -8,7 +8,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 export default function FormDialog({ open, handleClose, loading, onSubmitCancel }) {
     const [description, setDescription] = useState('');
     const handleOption = (action) => {
-        console.log(action)
         onSubmitCancel({ action, payload: description });
     };
 
