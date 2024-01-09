@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FaFilePdf, FaFileImage, FaFileWord, FaFileExcel, FaCalendarAlt, FaArrowAltCircleDown, FaQuestion } from "react-icons/fa";
+import React, { useState, useMemo } from 'react';
+import { FaFilePdf, FaUser, FaFileImage, FaFileWord, FaFileExcel, FaCalendarAlt, FaArrowAltCircleDown, FaQuestion } from "react-icons/fa";
 import { GiCheckMark } from "react-icons/gi";
 import { RxCross2 } from "react-icons/rx";
 import ConfirmDialog from './globals/ConfirmDialog';
@@ -7,11 +7,23 @@ import { useApprove, useReject } from "../services/apis/payment";
 import { notify } from '../helpers/global';
 import FormDialog from './globals/FormDialog';
 import CommentDialog from './globals/CommentDialog';
-import { isoTimeFormater } from '../lib/util';
+import { getStatus, isoTimeFormater, shorttenUrl } from '../lib/util';
+import useGlobalStore from "../stores/global";
 
+export const ButtonNM = ({ handler, children, className }) => {
+    return <button onClick={handler} className={`text-white border-none outline-none rounded-full xs:rounded-md px-3 py-1 w-9 h-9 xs:w-auto xs:h-auto hover:cursor-pointer inline-flex justify-center items-center ${className}`}>
+        {children}
+    </button>
+}
+export const ButtonRD = ({ handler, children, className }) => {
+    return <button onClick={handler} className={`ring-1 outline-none rounded-full xs:rounded-md px-3 py-1  hover:text-white hover:ring-0 hover:cursor-pointer w-9 h-9 xs:w-auto xs:h-auto inline-flex justify-center items-center ${className}`}>
+        {children}
+    </button>
+}
 
 export default function FilePreview({ receipt, updateReceipt }) {
-    const { file_url: fileUrl, description, createdAt, status, id, reject_comment } = receipt;
+    const { auth_user } = useGlobalStore(state => state.data);
+    const { file_url: fileUrl, description, createdAt, status, id, uploader_name, uploader_phone, reject_comment } = receipt;
     const { mutateAsync: approveReceipt, isLoading: isApproving } = useApprove();
     const { mutateAsync: rejectReceipt, isLoading: isRejecting } = useReject();
     const [documentType] = useState(['doc', 'docx', 'pdf', 'odt', 'csv', 'xlsx']);
@@ -29,10 +41,6 @@ export default function FilePreview({ receipt, updateReceipt }) {
     const extracFileExtension = (fileUrl) => {
         const extention = fileUrl?.split('.')
         return extention[extention?.length - 1]?.toLowerCase()
-    }
-    const shorttenUrl = (fileUrl) => {
-        const removed = fileUrl.slice(0, 25);
-        return `${removed}...`
     }
 
     const handleClose = () => {
@@ -89,6 +97,8 @@ export default function FilePreview({ receipt, updateReceipt }) {
         handleCloseComment()
     }
 
+    const requestStatus = useMemo(() => getStatus(status), [status]);
+
     return (
         <div>
             {open && <ConfirmDialog open={open} handleClose={handleClose} loading={isApproving} onAgreeDisagree={handleAgreeDisagree} />}
@@ -114,29 +124,27 @@ export default function FilePreview({ receipt, updateReceipt }) {
                             <small className='font-medium ml-2'>{isoTimeFormater(createdAt)}</small>
                         </p>
                     </div>
+                    <div className='text-slate-500 capitalize border-b pb-3 pt-1 text-md flex space-x-3 items-center'>
+                        <FaUser className="text-blue-900 text-xl" />
+                        <span>{uploader_name} • {uploader_phone}</span>
+                    </div>
                     <div className="flex items-center border-b border-slate-300 pb-3 pt-1">
                         <textarea readOnly cols="90" rows="1" className="text-slate-500 text-md outline-none" value={content} />
                     </div>
                     <div className="flex justify-between items-center space-x-3 border-slate-300 pb-2 pt-[2px]">
                         <p className='font-medium text-slate-500'>Status:
-                            {status === '0' && <span className='text-yellow-500 ml-2'>Pending</span>}
-                            {status === '1' && <span className='text-green-500 ml-2'>Approved</span>}
-                            {status === '-1' && <span className='text-red-500 ml-2'>Rejected</span>}
+                            <span className={`ml-2 capitalize ${status === '0' && 'text-yellow-500'} ${status === '1' && 'text-green-500'} ${status === '-1' && 'text-red-500'}`}>{requestStatus}</span>
                         </p>
-                        {status === '0' &&
+                        {(status === '0' && auth_user.isAdmin) &&
                             <p className='flex items-center space-x-3'>
-                                <button onClick={() => setOpenForm(true)} className='ring-1 ring-red-500 outline-none rounded-full
-                            xs:rounded-md px-3 py-1 hover:bg-red-500 hover:text-white hover:ring-0 hover:cursor-pointer
-                            w-9 h-9 xs:w-auto xs:h-auto inline-flex justify-center items-center'>
+                                <ButtonRD handler={() => setOpenForm(true)} className='ring-red-500 hover:bg-red-500'>
                                     <span className='hidden xs:block'>Reject</span>
                                     <RxCross2 className='block xs:hidden' />
-                                </button>
-                                <button onClick={() => setOpen(true)} className='bg-green-500 hover:bg-green-600 text-white border-none
-                            outline-none rounded-full
-                            xs:rounded-md px-3 py-1 w-9 h-9 xs:w-auto xs:h-auto hover:cursor-pointer inline-flex justify-center items-center'>
+                                </ButtonRD>
+                                <ButtonNM handler={() => setOpen(true)} className='bg-green-500 hover:bg-green-600'>
                                     <span className='hidden xs:block'>Approve</span>
                                     <GiCheckMark className='block xs:hidden' />
-                                </button>
+                                </ButtonNM>
                             </p>
                         }
                         {status === '-1' &&
@@ -167,29 +175,27 @@ export default function FilePreview({ receipt, updateReceipt }) {
                             <small className='font-medium ml-2'>{isoTimeFormater(createdAt)}</small>
                         </p>
                     </div>
+                    <div className='text-slate-500 capitalize border-b pb-3 pt-1 text-md flex space-x-3 items-center'>
+                        <FaUser className="text-blue-900 text-xl" />
+                        <span>{uploader_name} • {uploader_phone}</span>
+                    </div>
                     <div className="flex items-center border-b border-slate-300 pb-3 pt-1">
                         <textarea readOnly cols="90" rows="1" className="text-slate-500 text-md outline-none" value={content} />
                     </div>
                     <div className="flex justify-between items-center space-x-3 border-slate-300 pb-2 pt-[2px]">
                         <p className='font-medium text-slate-500'>Status:
-                            {status === '0' && <span className='text-yellow-500 ml-2'>Pending</span>}
-                            {status === '1' && <span className='text-green-500 ml-2'>Approved</span>}
-                            {status === '-1' && <span className='text-red-500 ml-2'>Rejected</span>}
+                            <span className={`ml-2 capitalize ${status === '0' && 'text-yellow-500'} ${status === '1' && 'text-green-500'} ${status === '-1' && 'text-red-500'}`}>{requestStatus}</span>
                         </p>
-                        {status === '0' &&
+                        {(status === '0' && auth_user.isAdmin) &&
                             <p className='flex items-center space-x-3'>
-                                <button onClick={() => setOpenForm(true)} className='ring-1 ring-red-500 outline-none rounded-full
-                            xs:rounded-md px-3 py-1 hover:bg-red-500 hover:text-white hover:ring-0 hover:cursor-pointer
-                            w-9 h-9 xs:w-auto xs:h-auto inline-flex justify-center items-center'>
+                                <ButtonRD handler={() => setOpenForm(true)} className='ring-red-500 hover:bg-red-500'>
                                     <span className='hidden xs:block'>Reject</span>
                                     <RxCross2 className='block xs:hidden' />
-                                </button>
-                                <button onClick={() => setOpen(true)} className='bg-green-500 hover:bg-green-600 text-white border-none
-                            outline-none rounded-full
-                            xs:rounded-md px-3 py-1 w-9 h-9 xs:w-auto xs:h-auto hover:cursor-pointer inline-flex justify-center items-center'>
+                                </ButtonRD>
+                                <ButtonNM handler={() => setOpen(true)} className='bg-green-500 hover:bg-green-600'>
                                     <span className='hidden xs:block'>Approve</span>
                                     <GiCheckMark className='block xs:hidden' />
-                                </button>
+                                </ButtonNM>
                             </p>
                         }
                         {status === '-1' &&

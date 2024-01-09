@@ -19,7 +19,6 @@ function UploadForm({ open, setClose, title }) {
         hiddenFileInput.current.click();
     };
     const handleChange = event => {
-        console.log(event.target.files)
         if (event.target.files && event.target.files.length > 0) {
             const fileUploaded = event.target.files[0]
             setFile(fileUploaded);
@@ -31,7 +30,7 @@ function UploadForm({ open, setClose, title }) {
                     setPreview(reader.result);
                 };
             } else {
-                setPreview('../../../public/file-placeholder.png');
+                setPreview('../../../file-placeholder.png');
             };
         } else {
             notify({ type: 'error', message: 'No file selected!' });
@@ -67,8 +66,8 @@ function UploadForm({ open, setClose, title }) {
                 } else {
                     const payload = {
                         request_id: requestId,
-                        uploader_name: auth_user.firstname,
-                        uploader_phone: auth_user.lastname,
+                        uploader_name: `${auth_user.firstname} ${auth_user.lastname}`,
+                        uploader_phone: auth_user.phone,
                         description,
                         file_url,
                         request: JSON.stringify(request),
@@ -106,7 +105,7 @@ function UploadForm({ open, setClose, title }) {
 
                 {preview &&
                     <div className="bg-white flex flex-col space-y-5 justify-center w-full">
-                        <img src={preview} alt="Preview" className="border-2 border-dashed w-full h-[200px] object-cover" />
+                        <img src={preview} alt="Preview" className="border-2 border-dashed w-full h-[200px] object-contain" />
                         <div className="w-full inline-flex justify-center">
                             <button onClick={handleClick} className="px-3 py-2 rounded-lg bg-blue-100 text-blue-600">Change selected file</button>
                         </div>

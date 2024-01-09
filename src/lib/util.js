@@ -125,3 +125,14 @@ export const generateFullName = (firstName, lastName) => {
         return `${formattedFirstName} ${formattedLastName}`;
     }
 };
+export const getStatus = (status) => {
+    if (status === '0') return 'pending';
+    if (status === '1') return 'approved';
+    if (status === '-1') return 'rejected';
+    else return '';
+}
+export const shorttenUrl = (fileUrl) => {
+    const removed = fileUrl.slice(0, 25);
+    return `${removed}...`
+}
+export const adminIds = ['08143274300'];

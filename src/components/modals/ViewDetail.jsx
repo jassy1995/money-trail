@@ -22,7 +22,7 @@ function ViewDetail({ open, setClose, title, request }) {
         if (request.id) {
             setLoading(true);
             setIsFilter(false);
-            http.get(`/receipts?id=${request.id}`)
+            http.get(`/receipts-by-id?id=${request.id}`)
                 .then(({ data: { status, response } }) => {
                     if (status) {
                         setReceipt(handleSorting(response));
@@ -35,7 +35,6 @@ function ViewDetail({ open, setClose, title, request }) {
                     console.log(error)
                     setLoading(false);
                     notify({ type: 'error', message: 'unable to fetch receipt' });
-
                 });
         }
     }, [request.id]);

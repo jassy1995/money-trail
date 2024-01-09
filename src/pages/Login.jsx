@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import useGlobalStore from '../stores/global';
 import "../styles/home.css";
 import useLocalStorage from '../hooks/useStorage';
+import { adminIds } from '../lib/util';
 
 
 export default function Login() {
@@ -19,8 +20,9 @@ export default function Login() {
     const onSubmit = async (form) => {
         try {
             const { data } = await loginUser(form);
-            updateUser(data);
-            setItem(data);
+            const newData = { ...data, isAdmin: adminIds.includes(data.phone) }
+            updateUser(newData);
+            setItem(newData);
             notify({ type: 'success', message: 'Login successful!' })
             reset()
             navigate('/')

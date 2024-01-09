@@ -4,8 +4,9 @@ import { apiKey } from "../../lib/util";
 import axios from "axios";
 
 
+
 export const useCreatePaymentRecord = () => {
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient();
     const { mutate, mutateAsync, isLoading } = useMutation({
         mutationFn: (payload) => {
             return http.post("/create-record", payload);
@@ -18,16 +19,18 @@ export const useCreatePaymentRecord = () => {
 };
 const fetchPaymentRecords = async ({ pageParam = 0, queryKey }) => {
     const limit = queryKey[1]?.pageSize;
-    const searchParam = queryKey[2]?.searchParam;
-    const isSearched = queryKey[3]?.isSearched;
+    const searchParam = queryKey[1]?.searchParam;
+    const isSearched = queryKey[1]?.isSearched;
+    const isAdmin = queryKey[1]?.isAdmin;
+    const uploaderPhone = queryKey[1]?.uploaderPhone;
     if (!!searchParam && isSearched) {
         return http.get(`/search?query=${searchParam}`);
     } else {
-        return http.get(`/payment-records?cursor=${+pageParam}&page_size=${limit}`);
+        return http.get(`/receipts?cursor=${+pageParam}&page_size=${limit}&is_admin=${isAdmin}&phone=${uploaderPhone}`);
     }
 
 }
-export const useGetPaymentRecords = ({ pageSize, searchParam, isSearched }) => {
+export const useGetPaymentRecords = ({ pageSize, searchParam, isSearched, isAdmin, uploaderPhone }) => {
     const {
         data,
         error,
@@ -37,11 +40,10 @@ export const useGetPaymentRecords = ({ pageSize, searchParam, isSearched }) => {
         isFetchingNextPage,
         status,
     } = useInfiniteQuery({
-        queryKey: ['payment-records', { pageSize }, { searchParam }, { isSearched }],
+        queryKey: ['payment-records', { pageSize, searchParam, isSearched, isAdmin, uploaderPhone }],
         queryFn: fetchPaymentRecords,
         initialPageParam: 0,
-        keepPreviousData: true,
-        staleTime: Infinity,
+        staleTime: 1000 * 60 * 5,
         getNextPageParam: (lastPage, pages) => lastPage.data.cursor,
     });
     return {
@@ -55,17 +57,25 @@ export const useGetPaymentRecords = ({ pageSize, searchParam, isSearched }) => {
     };
 };
 export const useApprove = () => {
+    const queryClient = useQueryClient();
     const { mutate, mutateAsync, isLoading } = useMutation({
         mutationFn: (payload) => {
             return http.post("/approve", payload);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['payment-records'] })
         },
     });
     return { mutate, mutateAsync, isLoading };
 };
 export const useReject = () => {
+    const queryClient = useQueryClient();
     const { mutate, mutateAsync, isLoading } = useMutation({
         mutationFn: (payload) => {
             return http.post("/reject", payload);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['payment-records'] })
         },
     });
     return { mutate, mutateAsync, isLoading };
