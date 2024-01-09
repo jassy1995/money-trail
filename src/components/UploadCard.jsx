@@ -50,15 +50,15 @@ function UploadCard({ record, setCurrentRequest, isSearched, setOpenDialog, setO
                             </div>
                         </div>
                         <div className='text-slate-600 capitalize'>By • {res.uploader_name} • {res.uploader_phone} </div>
-                        <div className='text-slate-500 text-md'>
-                            <span>{createdAt?.split('T')[0]}</span>
-                            <small className='font-medium ml-2'>{isoTimeFormater(createdAt)}</small>
-                        </div>
                         <div className="text-slate-500 font-normal underline-offset-2 flex space-x-3 items-center">
                             <span>{shorttenUrl(res?.file_url)}</span>
                             <a className="text-slate-400 text-2xl font-bold" target="_blank" href={res?.file_url} download>
                                 <FaArrowAltCircleDown className='text-[24px] cursor-pointer' />
                             </a>
+                        </div>
+                        <div className='text-slate-500 text-md'>
+                            <small>{createdAt?.split('T')[0]}</small>
+                            <small className='font-medium ml-2'>{isoTimeFormater(createdAt)}</small>
                         </div>
                         <hr className='mt-2 mb-3' />
                         <div className='flex justify-between'>
