@@ -44,7 +44,7 @@ function UploadCard({ record, setCurrentRequest, isSearched, setOpenDialog, setO
             </div>}
             {!isSearched &&
                 <div className='flex flex-col justify-cente items-center sm:flex-row space-y-3 space-x-0 sm:space-y-0 sm:space-x-5 bg-white w-full p-4 card'>
-                    <img src={processedImageUrl} className='w-full h-[170px] sm:w-[170px] sm:h-[170px] object-cover rounded-md' alt="" />
+                    <img src={processedImageUrl} className='w-full h-[300px] sm:w-[170px] sm:h-[170px] object-cover rounded-md' alt="" />
                     <div className='flex flex-col w-full'>
                         <div className="flex justify-between items-center">
                             <div className='capitalize text-black font-medium'>{request?.borrower_name?.toLowerCase()} • <span>{request?.borrower_phone}</span> </div>

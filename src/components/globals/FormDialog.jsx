@@ -23,7 +23,7 @@ export default function FormDialog({ open, handleClose, loading, onSubmitCancel 
                 </DialogContent>
                 <DialogActions className='mb-5 sm:mt-5 mx-5 flex flex-col-reverse sm:flex-row justify-center space-y-2 sm:space-y-0 space-x-0 sm:space-x-3'>
                     <button onClick={() => handleOption('cancel')} className='border border-slate-200 rounded-sm py-2 px-3 w-full sm:w-auto mt-4 font-medium sm:mt-0 hover:bg-slate-100 hover:cursor-pointer text-md'>Cancel</button>
-                    <button disabled={loading} onClick={() => handleOption('submit')} className='bg-green-500 text-white  rounded-sm w-full sm:w-auto py-2 px-3 font-medium text-md hover:bg-green-600 hover:cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed'>
+                    <button disabled={loading || !description} onClick={() => handleOption('submit')} className='bg-green-500 text-white  rounded-sm w-full sm:w-auto py-2 px-3 font-medium text-md hover:bg-green-600 hover:cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed'>
                         {loading && <i className="fa fa-circle-notch fa-spin mr-2"></i>}
                         Submit
                     </button>
