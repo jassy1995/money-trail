@@ -68,7 +68,7 @@ function UploadCard({ record, setCurrentRequest, isSearched, setOpenDialog, setO
                             <small className='font-medium ml-2'>{isoTimeFormater(createdAt)}</small>
                         </div>
                         <hr className='mt-2 mb-3' />
-                        <div className='flex justify-between'>
+                        <div className={`flex  justify-between ${auth_user?.isAdmin ? 'flex-row-reverse xs:flex-row' : ''}`}>
                             {auth_user?.isAdmin &&
                                 <div className='flex items-center space-x-3'>
                                     <ButtonNM handler={setOpenFormDialog} className='bg-red-500 hover:bg-red-500'>
