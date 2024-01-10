@@ -136,3 +136,17 @@ export const shorttenUrl = (fileUrl) => {
     return `${removed}...`
 }
 export const adminIds = ['08143274300'];
+export const formatCurrency = (value) => {
+    return new Intl.NumberFormat("en-NG", {
+        style: "currency",
+        currency: "NGN",
+    }).format(+value);
+}
+export const removeKobo = (currency) => {
+    const koboPart = currency.slice(-3);
+    if (koboPart === '.00') {
+        return currency.slice(0, -3);
+    } else {
+        return currency;
+    }
+}

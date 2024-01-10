@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { getStatus, isoTimeFormater, shorttenUrl } from '../lib/util';
+import { formatCurrency, getStatus, isoTimeFormater, removeKobo, shorttenUrl } from '../lib/util';
 import { ButtonNM } from './FilePreview';
 import { RxCross2 } from 'react-icons/rx';
 import { GiCheckMark } from 'react-icons/gi';
@@ -18,6 +18,11 @@ function UploadCard({ record, setCurrentRequest, isSearched, setOpenDialog, setO
             }
         };
     }, [borrower_photo]);
+
+    const formatAmount = (value) => {
+        const amount = formatCurrency(value);
+        return removeKobo(amount);
+    }
 
     const processedImageUrl = getImage(borrower_photo || request?.borrower_photo);
     const requestStatus = useMemo(() => getStatus(status), [status]);
@@ -39,17 +44,19 @@ function UploadCard({ record, setCurrentRequest, isSearched, setOpenDialog, setO
             </div>}
             {!isSearched &&
                 <div className='flex flex-col justify-cente items-center sm:flex-row space-y-3 space-x-0 sm:space-y-0 sm:space-x-5 bg-white w-full p-4 card'>
-                    <img src={processedImageUrl} className='w-full h-[170px] sm:w-[150px] sm:h-[150px] object-cover rounded-md' alt="" />
+                    <img src={processedImageUrl} className='w-full h-[170px] sm:w-[170px] sm:h-[170px] object-cover rounded-md' alt="" />
                     <div className='flex flex-col w-full'>
                         <div className="flex justify-between items-center">
                             <div className='capitalize text-black font-medium'>{request?.borrower_name?.toLowerCase()} • <span>{request?.borrower_phone}</span> </div>
                             <div className="text-slate-600 font-normal hidden xs:flex space-x-4">
-                                <span>{request_id}</span>
+                                <span>{formatAmount(res?.receipt_amount)}</span>
                                 <span className={`px-2 rounded-md text-white capitalize font-normal ${status === '0' && 'bg-yellow-500'} ${status === '1' && 'bg-green-500'} ${status === '-1' && 'bg-red-500'}`}>{requestStatus}</span>
 
                             </div>
                         </div>
-                        <div className='text-slate-600 capitalize'>By • {res.uploader_name} • {res.uploader_phone} </div>
+                        <div className='xs:hidden inline-flex items-center'>Amount • {formatAmount(res?.receipt_amount)}</div>
+                        <div className='inline-flex items-center text-slate-700'>Bank • <span className='uppercase ml-1'>{res.bank?.replace('-', ' ')}</span></div>
+                        <div className='text-slate-600 capitalize'>{res.uploader_name} • {res.uploader_phone} </div>
                         <div className="text-slate-500 font-normal underline-offset-2 flex space-x-3 items-center">
                             <span>{shorttenUrl(res?.file_url)}</span>
                             <a className="text-slate-400 text-2xl font-bold" target="_blank" href={res?.file_url} download>
@@ -74,9 +81,9 @@ function UploadCard({ record, setCurrentRequest, isSearched, setOpenDialog, setO
                                     </ButtonNM>
                                 </div>
                             }
-                            <div className="text-slate-600 flex items-center font-normal xs:hidden space-x-4">
+                            <div className="text-slate-600 flex items-center font-normal space-x-4">
                                 <span>{request_id}</span>
-                                <span className={`px-2 pb-[1px] sm:pb-0 rounded-md text-white capitalize font-normal ${status === '0' && 'bg-yellow-500'} ${status === '1' && 'bg-green-500'} ${status === '-1' && 'bg-red-500'}`}>{requestStatus}</span>
+                                <span className={`xs:hidden px-2 pb-[1px] sm:pb-0 rounded-md text-white capitalize font-normal ${status === '0' && 'bg-yellow-500'} ${status === '1' && 'bg-green-500'} ${status === '-1' && 'bg-red-500'}`}>{requestStatus}</span>
 
                             </div>
                         </div>

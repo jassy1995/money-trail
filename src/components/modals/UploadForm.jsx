@@ -11,9 +11,25 @@ function UploadForm({ open, setClose, title }) {
     const [file, setFile] = useState(null);
     const [requestId, setRequestId] = useState('');
     const [description, setDescription] = useState('');
+    const [amount, setAmount] = useState('');
+    const [bank, setBank] = useState('');
     const [isUploading, setIsUploading] = useState(false);
     const [preview, setPreview] = useState();
     const hiddenFileInput = useRef(null);
+    const [banks] = useState([
+        { value: 'wema', title: 'WEMA' },
+        { value: 'providus-lenders', title: 'PROVIDUS LENDERS' },
+        { value: 'providus-rent', title: 'PROVIDUS RENT' },
+        { value: 'providus-bnpl', title: 'PROVIDUS BNPL' },
+        { value: 'providus-m2m', title: 'providus M2M' },
+        { value: 'rent-a', title: 'RENT A' },
+        { value: 'merchant', title: 'MERCHANT' },
+        { value: 'tnpl', title: 'TNPL' },
+        { value: 'school-a', title: 'SCHOOL A' },
+        { value: 'bnpl-a', title: 'BNPL A' },
+        { value: 'illeyah-zenith', title: 'ILLEYAH ZENITH' },
+        { value: '440-zenith', title: '440 ZENITH' }
+    ]);
 
     const handleClick = event => {
         hiddenFileInput.current.click();
@@ -22,7 +38,6 @@ function UploadForm({ open, setClose, title }) {
         if (event.target.files && event.target.files.length > 0) {
             const fileUploaded = event.target.files[0]
             setFile(fileUploaded);
-            console.log(file)
             if (fileUploaded.type.includes("image")) {
                 const reader = new FileReader();
                 reader.readAsDataURL(fileUploaded);
@@ -52,7 +67,6 @@ function UploadForm({ open, setClose, title }) {
         try {
             setIsUploading(true);
             const request = await getRequestById(requestId);
-            console.log(request);
             if (!request) {
                 setIsUploading(false);
                 notify({ type: 'error', message: 'Request not found!' });
@@ -71,6 +85,8 @@ function UploadForm({ open, setClose, title }) {
                         description,
                         file_url,
                         request: JSON.stringify(request),
+                        receipt_amount: amount,
+                        bank
                     }
                     const { data: { status } } = await createPayemtRecord(payload);
                     if (!status) {
@@ -80,6 +96,8 @@ function UploadForm({ open, setClose, title }) {
                         setIsUploading(false);
                         notify({ type: 'success', message: 'Uploaded successfully' });
                         setRequestId('');
+                        setAmount('');
+                        setBank('');
                         setFile(null);
                         setPreview(null);
                         setDescription('');
@@ -94,8 +112,24 @@ function UploadForm({ open, setClose, title }) {
     }
     return (
         <Modal open={open} setClose={setClose} title={title} width='max-w-2xl'>
-            <div className="flex flex-col justify-center items-center space-y-10 pb-10 bg-white w-full">
-                <input type="number" value={requestId} name="requestId" onChange={(e) => setRequestId(e.target.value)} className="outline-none mt-10 w-full px-4 py-3 border rounded-lg shadow-sm" placeholder="enter request id" />
+            <div className="flex flex-col justify-center items-center space-y-3 pt-3 bg-white w-full">
+                <div className="flex flex-col space-y-1 w-full">
+                    <label htmlFor="requestId" className="text-slate-600 font-normal">Request ID</label>
+                    <input type="number" value={requestId} name="requestId" onChange={(e) => setRequestId(e.target.value)} className="outline-none mt-8 w-full px-4 py-2 border rounded-lg shadow-sm placeholder:text-slate-200" placeholder="enter the request id" />
+                </div>
+                <div className="flex flex-col space-y-1 w-full">
+                    <label htmlFor="requestId" className="text-slate-600 font-normal">Amount</label>
+                    <input type="number" value={amount} name="requestId" onChange={(e) => setAmount(e.target.value)} className="outline-none mt-8 w-full px-4 py-2 border rounded-lg shadow-sm placeholder:text-slate-200" placeholder="enter the receipt amount" />
+                </div>
+                <div className="flex flex-col space-y-1 w-full">
+                    <label htmlFor="requestId" className="text-slate-600 font-normal">Bank</label>
+                    <select value={bank} onChange={(e) => setBank(e.target.value)} className='placeholder:text-slate-100 placeholder:text-sm  px-2 py-1 outline-none border rounded-lg shadow-sm h-[44px]'>
+                        <option value="" disabled hidden>choose bank...</option>
+                        {banks.map(({ value, title }) => (
+                            <option key={value} value={value}>{title}</option>
+                        ))}
+                    </select>
+                </div>
                 <input
                     type="file"
                     ref={hiddenFileInput}
@@ -120,7 +154,7 @@ function UploadForm({ open, setClose, title }) {
 
                 <textarea value={description} onChange={(e) => setDescription(e.target.value)} name="" id="" placeholder="description (optional)" className="outline-none mt-10 w-full h-20 p-4 border rounded-lg shadow-sm"></textarea>
                 <div className="w-full">
-                    <button disabled={isLoading || isUploading || !requestId || !file} onClick={submitForm} className="text-white bg-blue-500 hover:bg-blue-600 rounded-lg px-3 py-2 w-full sm:w-32 font-normal disabled:opacity-75 disabled:cursor-not-allowed">
+                    <button disabled={isLoading || isUploading || !requestId || !file || !amount || !bank} onClick={submitForm} className="text-white bg-blue-500 hover:bg-blue-600 rounded-lg px-3 py-2 w-full sm:w-32 font-normal disabled:opacity-75 disabled:cursor-not-allowed">
                         {(isUploading || isLoading) && <i className="fa fa-circle-notch fa-spin mr-2"></i>}
                         Submit
                     </button>

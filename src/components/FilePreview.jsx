@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { FaFilePdf, FaUser, FaFileImage, FaFileWord, FaFileExcel, FaCalendarAlt, FaArrowAltCircleDown, FaQuestion } from "react-icons/fa";
 import { GiCheckMark } from "react-icons/gi";
+import { BsBank2 } from "react-icons/bs";
 import { RxCross2 } from "react-icons/rx";
 import ConfirmDialog from './globals/ConfirmDialog';
 import { useApprove, useReject } from "../services/apis/payment";
 import { notify } from '../helpers/global';
 import FormDialog from './globals/FormDialog';
 import CommentDialog from './globals/CommentDialog';
-import { getStatus, isoTimeFormater, shorttenUrl } from '../lib/util';
+import { formatCurrency, getStatus, isoTimeFormater, removeKobo, shorttenUrl } from '../lib/util';
 import useGlobalStore from "../stores/global";
 
 export const ButtonNM = ({ handler, children, className }) => {
@@ -23,7 +24,7 @@ export const ButtonRD = ({ handler, children, className }) => {
 
 export default function FilePreview({ receipt, updateReceipt }) {
     const { auth_user } = useGlobalStore(state => state.data);
-    const { file_url: fileUrl, description, createdAt, status, id, uploader_name, uploader_phone, reject_comment } = receipt;
+    const { file_url: fileUrl, description, createdAt, status, id, bank, receipt_amount, uploader_name, uploader_phone, reject_comment } = receipt;
     const { mutateAsync: approveReceipt, isLoading: isApproving } = useApprove();
     const { mutateAsync: rejectReceipt, isLoading: isRejecting } = useReject();
     const [documentType] = useState(['doc', 'docx', 'pdf', 'odt', 'csv', 'xlsx']);
@@ -97,6 +98,11 @@ export default function FilePreview({ receipt, updateReceipt }) {
         handleCloseComment()
     }
 
+    const formatAmount = (value) => {
+        const amount = formatCurrency(value);
+        return removeKobo(amount);
+    }
+
     const requestStatus = useMemo(() => getStatus(status), [status]);
 
     return (
@@ -124,9 +130,21 @@ export default function FilePreview({ receipt, updateReceipt }) {
                             <small className='font-medium ml-2'>{isoTimeFormater(createdAt)}</small>
                         </p>
                     </div>
-                    <div className='text-slate-500 capitalize border-b pb-3 pt-1 text-md flex space-x-3 items-center'>
-                        <FaUser className="text-blue-900 text-xl" />
-                        <span>{uploader_name} • {uploader_phone}</span>
+                    <div className='text-slate-500 capitalize border-b pb-3 pt-1 text-md flex justify-between items-center'>
+                        <div className='flex items-center space-x-3'>
+                            <BsBank2 className="text-blue-900 text-xl" />
+                            <span className='uppercase'>{bank?.replace('-', ' ')}</span>
+                        </div>
+                        <div>
+                            {formatAmount(receipt_amount)}
+                        </div>
+                    </div>
+                    <div className='text-slate-500 capitalize border-b pb-3 pt-1 text-md flex justify-between items-center'>
+                        <div className='flex items-center space-x-3'>
+                            <FaUser className="text-blue-900 text-xl" />
+                            <span>{uploader_name}</span>
+                        </div>
+                        <div>{uploader_phone}</div>
                     </div>
                     <div className="flex items-center border-b border-slate-300 pb-3 pt-1">
                         <textarea readOnly cols="90" rows="1" className="text-slate-500 text-md outline-none" value={content} />
@@ -175,9 +193,21 @@ export default function FilePreview({ receipt, updateReceipt }) {
                             <small className='font-medium ml-2'>{isoTimeFormater(createdAt)}</small>
                         </p>
                     </div>
-                    <div className='text-slate-500 capitalize border-b pb-3 pt-1 text-md flex space-x-3 items-center'>
-                        <FaUser className="text-blue-900 text-xl" />
-                        <span>{uploader_name} • {uploader_phone}</span>
+                    <div className='text-slate-500 capitalize border-b pb-3 pt-1 text-md flex justify-between items-center'>
+                        <div className='flex items-center space-x-3'>
+                            <BsBank2 className="text-blue-900 text-xl" />
+                            <span className='uppercase'>{bank?.replace('-', ' ')}</span>
+                        </div>
+                        <div>
+                            {formatAmount(receipt_amount)}
+                        </div>
+                    </div>
+                    <div className='text-slate-500 capitalize border-b pb-3 pt-1 text-md flex justify-between items-center'>
+                        <div className='flex items-center space-x-3'>
+                            <FaUser className="text-blue-900 text-xl" />
+                            <span>{uploader_name}</span>
+                        </div>
+                        <div>{uploader_phone}</div>
                     </div>
                     <div className="flex items-center border-b border-slate-300 pb-3 pt-1">
                         <textarea readOnly cols="90" rows="1" className="text-slate-500 text-md outline-none" value={content} />
