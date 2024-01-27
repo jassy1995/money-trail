@@ -135,7 +135,7 @@ export const shorttenUrl = (fileUrl) => {
     const removed = fileUrl.slice(0, 25);
     return `${removed}...`
 }
-export const adminIds = ['08143274300'];
+export const adminIds = ['08143274300', '09062827907'];
 export const formatCurrency = (value) => {
     return new Intl.NumberFormat("en-NG", {
         style: "currency",
